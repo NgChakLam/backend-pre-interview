@@ -20,4 +20,5 @@ from echo import views
 urlpatterns = [  # pylint: disable=invalid-name
     url(r'^echo/$', views.echo),
     url('admin/', admin.site.urls),
+    url('data/', views.echoXML),
 ]
