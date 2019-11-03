@@ -47,7 +47,7 @@ def XMLDataCreate(request):
     if request.method == 'POST':
         data = request.data
         if data:                
-            if 'devices' in data: 
+            if 'devices' in data and data['devices']: 
                 # save the devices information
                 for device_code,device_name in data['devices'].items():
                     device, created = Device.objects.get_or_create(code=device_code,
@@ -66,8 +66,12 @@ def XMLDataCreate(request):
                         serializer = ElementSerializer(data=element_data)
                         if serializer.is_valid():
                             serializer.save()
+                            """
+                            May use apscheduler to handle mass data
+                            """
+                            #scheduler.add_job(serializer.save(),) 
                         else:
-                            response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)            
+                            response(serializer.errors,status=status.HTTP_424_FAILED_DEPENDENCY)            
                 return response(status=status.HTTP_201_CREATED)
     return response(status=status.HTTP_400_BAD_REQUEST)
 
