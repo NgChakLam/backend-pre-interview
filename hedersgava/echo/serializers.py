@@ -6,6 +6,14 @@ class ElementSerializer(serializers.ModelSerializer):
     class Meta:
         model = Element
         fields = '__all__'
+        
+    def to_representation(self,obj):
+        return {
+            "datetime": obj.record_time,
+            "value": obj.value,
+            "unit": obj.unit(),
+        }
+        
 
 """
 class DeviceSerializer(serializers.ModelSerializer):

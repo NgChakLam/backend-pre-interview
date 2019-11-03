@@ -20,5 +20,7 @@ from echo import views
 urlpatterns = [  # pylint: disable=invalid-name
     url(r'^echo/$', views.echo),
     url('admin/', admin.site.urls),
-    url('data/', views.echoXML),
+    url('data/$', views.XMLDataCreate),
+    url('data/list/$', views.XMLDataList),
+    url(r'^data/(?P<id>[0-9]+)/$', views.XMLDataDisplay),
 ]

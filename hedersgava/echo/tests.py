@@ -23,3 +23,19 @@ class TestEcho:
         assert response.status_code == 200
         response.render()
         assert response.data == data
+        
+        
+class TestXMLDataCreate:
+    @given(xml_data=xml_data)
+    def test_XMLDataCreate(self):
+        """Testing _XMLDataCreate api response status result is function correctly with xml data
+        """
+        pass
+    
+class TestXMLDataDisplay:
+    def test_XMLDataDisplay_json_status_result(self):
+        """Testing _XMLDataDisplay api response status result is function correctly with json data
+        """
+        pass
+        
+        
