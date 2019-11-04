@@ -3,13 +3,12 @@
 import os
 import json
 import datetime
+import pytest
 from string import printable
-
 from hypothesis import strategies as st
 from hypothesis import given,example
 from django.test import Client
 import xml.etree.cElementTree as ET
-
 from .views import echo, XMLDataCreate
 
 json_data = st.recursive(st.booleans() | st.floats() | st.text(printable),
@@ -33,10 +32,8 @@ def sample_xml(id_value,time_value):
     Generate XML data for testing
     """
     root = ET.Element("root")
-    data = ET.SubElement(root, "data")    
-    
+    data = ET.SubElement(root, "data")   
     ET.SubElement(root, 'id').text = str(id_value)
-    #id.text = str(id_value)
     record_time=ET.SubElement(root, 'record_time')
     element = ET.SubElement(data, 'element')
     element_list={             
@@ -53,11 +50,6 @@ def sample_xml(id_value,time_value):
         ET.SubElement(element, 'device').text=d
         ET.SubElement(element, 'value').text=v
     
-    #device = ET.SubElement(element, 'device')    
-    
-    #value = ET.SubElement(element, 'value')
-   
-    
     devices = ET.SubElement(root, 'devices')
 
     device_list={
@@ -68,57 +60,35 @@ def sample_xml(id_value,time_value):
                 'SGD-12344':'Power Meter',
             }
     for code,name in device_list.items():   
-        #ET.SubElement(devices,code)
         ET.SubElement(devices,code).text=name
      
     record_time.text=str(int(time_value.timestamp()))
-    data= ET.tostring(root,encoding="unicode")
-    
-    
+    data= ET.tostring(root,encoding="unicode")       
     return data
     
-    #print(tree)
 
-    
-#xml_data =  (device=st.text(min_size=1)))
-            #'device':st.text(min_size=1),
-            #'value':st.decimals(),
-            #'no_of_element':st.integers(min_value=0),
-            #'time':st.datetimes(),
-"""
-workpath = os.path.dirname(os.path.abspath(__file__))
-file = open(os.path.join(workpath, 'sample.xml'), 'r')
-sample_xml=file.read()
-print(sample_xml)
-file.close()
-"""
-import pytest
 class TestXMLDataCreate:
     @pytest.mark.django_db
     @given(
+        #Code maybe use to generate random data(not complete)
         #device=st.text(min_size=1),
         #device_code=st.text(min_size=1),
         #value=st.decimals(),
-        #no_of_element=st.integers(min_value=0),
+        #no_of_element=st.integers(min_value=0),        
         time=st.datetimes(min_value=datetime.datetime(1970, 1, 2, 0),max_value=datetime.datetime(3002, 12, 31, 0, 0)),
         id=st.integers(min_value=1,max_value=10000),
            )
 
-    #@example(xml_data=str(sample_xml))
     def test_XMLDataCreate(self,time,id, rf):
-    #def test_XMLDataCreate(self,xml_data, rf):
         """Testing _XMLDataCreate api response status result is function correctly with xml data
         """
         xml_data = sample_xml(id_value=id,time_value=time)
         data='<?xml version="1.0" encoding="UTF-8"?>'+xml_data
-        #data=xml_data
         print('data:',data)
         request = rf.post('/data/', data, content_type='application/xml')
         response = XMLDataCreate(request)
         assert response.status_code == 201
         print(response.render())
-        #import pytest
-        #pytest.set_trace()
         
 class TestXMLDataDisplay:
     def test_XMLDataDisplay_json_status_result(self):
