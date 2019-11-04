@@ -2,6 +2,7 @@
 """
 import os
 import json
+import datetime
 from string import printable
 
 from hypothesis import strategies as st
@@ -27,28 +28,53 @@ class TestEcho:
         assert response.data == data
 
 
-def sample_xml(id_value):
+def sample_xml(id_value,time_value):
     """
     Generate XML data for testing
     """
     root = ET.Element("root")
     data = ET.SubElement(root, "data")    
     
-    id = ET.SubElement(root, 'id')
-    id.text = str(id_value)
+    ET.SubElement(root, 'id').text = str(id_value)
+    #id.text = str(id_value)
     record_time=ET.SubElement(root, 'record_time')
     element = ET.SubElement(data, 'element')
-    device = ET.SubElement(element, 'device')
+    element_list={             
+                'SGD-12344':'1234.266',
+                'SGB-11233':'60',
+                'SCC-525':'220',
+                'SGC-1552':'5266.66',
+                'SGB-11233':'440',
+                'G3112':'32.266',
+                'SGD-12344':'1234.266',
+                }
     
-    value = ET.SubElement(element, 'value')
-       
+    for d,v in element_list.items():
+        ET.SubElement(element, 'device').text=d
+        ET.SubElement(element, 'value').text=v
+    
+    #device = ET.SubElement(element, 'device')    
+    
+    #value = ET.SubElement(element, 'value')
+   
     
     devices = ET.SubElement(root, 'devices')
-    device_code_list=['G3112','SCC-525','SGB-11233','SGC-1552','SGD-12344']
-    device_name_list=['Temperature Sensor','Voltage Meter','Current Meter','Power Meter','Power Meter']
-    for code in device_code_list:
-        ET.SubElement(devices,code)
+
+    device_list={
+                'G3112':'Temperature Sensor',
+                'SCC-525':'Voltage Meter',
+                'SGB-11233':'Current Meter',
+                'SGC-1552':'Power Meter',
+                'SGD-12344':'Power Meter',
+            }
+    for code,name in device_list.items():   
+        #ET.SubElement(devices,code)
+        ET.SubElement(devices,code).text=name
+     
+    record_time.text=str(int(time_value.timestamp()))
     data= ET.tostring(root,encoding="unicode")
+    
+    
     return data
     
     #print(tree)
@@ -59,32 +85,33 @@ def sample_xml(id_value):
             #'value':st.decimals(),
             #'no_of_element':st.integers(min_value=0),
             #'time':st.datetimes(),
-            
+"""
 workpath = os.path.dirname(os.path.abspath(__file__))
 file = open(os.path.join(workpath, 'sample.xml'), 'r')
 sample_xml=file.read()
 print(sample_xml)
 file.close()
-    
+"""
+import pytest
 class TestXMLDataCreate:
-    """
+    @pytest.mark.django_db
     @given(
-        device=st.text(min_size=1),
+        #device=st.text(min_size=1),
         #device_code=st.text(min_size=1),
-        value=st.decimals(),
-        no_of_element=st.integers(min_value=0),
-        time=st.datetimes(),
-        id=st.integers(min_value=1),
+        #value=st.decimals(),
+        #no_of_element=st.integers(min_value=0),
+        time=st.datetimes(min_value=datetime.datetime(1970, 1, 2, 0),max_value=datetime.datetime(3002, 12, 31, 0, 0)),
+        id=st.integers(min_value=1,max_value=10000),
            )
-    """
+
     #@example(xml_data=str(sample_xml))
-    #def test_XMLDataCreate(self,device,value,no_of_element,time,id, rf):
-    def test_XMLDataCreate(self,xml_data, rf):
+    def test_XMLDataCreate(self,time,id, rf):
+    #def test_XMLDataCreate(self,xml_data, rf):
         """Testing _XMLDataCreate api response status result is function correctly with xml data
         """
-        
-        #data='<?xml version="1.0" encoding="UTF-8"?>'+xml_data
-        data=xml_data
+        xml_data = sample_xml(id_value=id,time_value=time)
+        data='<?xml version="1.0" encoding="UTF-8"?>'+xml_data
+        #data=xml_data
         print('data:',data)
         request = rf.post('/data/', data, content_type='application/xml')
         response = XMLDataCreate(request)

@@ -1,16 +1,16 @@
 from django.db import models
 
 # Create your models here.
-
+"""
 class Data(models.Model):
     data_id= models.IntegerField('Data ID')    
     element = models.ManyToManyField('Element')
     #record_time = models.CharField('Record_time',max_length=20)
     record_time = models.DateTimeField('Record Time')
-    
-class Element(models.Model):
-    #device = models.OneToOneField('Device',on_delete=models.CASCADE,)
-    device = models.CharField('Device', max_length=20)    
+"""
+   
+class Element(models.Model):    
+    device = models.CharField('Device', max_length=20,null=True)    
     value = models.FloatField('value')
     data_id= models.PositiveIntegerField('Data ID') 
     record_time = models.DateTimeField('Record Time')
@@ -27,7 +27,7 @@ class Element(models.Model):
     
 class Device(models.Model):
     code = models.CharField('Device Code', max_length=20,unique=True)
-    name = models.CharField('Device Name', max_length=25)
+    name = models.CharField('Device Name', max_length=25,null=True)
     
     def __str__(self):
         return '%s : %s' %(self.code, self.name )

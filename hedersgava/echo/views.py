@@ -56,7 +56,7 @@ def XMLDataCreate(request):
 
             if 'data' in data:
                 for element in data['data']:
-                    if 'device' in element and 'value' in element:
+                    if 'device' in element and 'value' in element :
                         element_data={
                             'device':element['device'],
                             'value':element['value'],
